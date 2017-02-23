@@ -70,11 +70,17 @@ if (buildAndPackagingReq) {
         echo 'Compile and Packaging runs as separate entities , it is inferred that the App package is compiler dependant'
         stage ('Build , Test and Package ') {
                 echo 'Working Directory for Docker Build file : ' + appWorkingDir
-                // *** LEFT EDITING HERE **//
+                def buildTagName = '${dockerRepo}/${dockerImageName}-build:${env.BUILD_NUMBER}'
+                def buildParams =  '--file ${buildDockerFile} ${appWorkingDir}'
+                echo "Build Tag Name :" +buildTagName
+                echo "Build Params : " +buildParams
+
+                appCompileAndPacking = docker.build("buildTagName","buildParams")
         }
 }else {
         echo 'Compile and Package are not seperate steps , it is inferred that the package is not compiler dependant'
 }
+// *** LEFT EDITING HERE **//
 
 
 
