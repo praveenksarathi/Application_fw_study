@@ -8,9 +8,10 @@ node {
         echo 'The Picked Up Code Path is : ${CodeLocPath}'
         
         if ("${CodeLocType}").toUpperCase() == 'GIT' {
+         CodeLocPath = CodeLocPath.substring(0, CodeLocPath.indexOf("//")+2) + scmUsername + ":" + scmPassword + "@" +CodeLocPath.substring(CodeLocPath.indexOf("//")+2, CodeLocPath.length());
         } else if ("${CodeLocType}").toUpperCase() == 'SVN' {
-        }else
-        {
+         sh "svn co --username ${scmUsername} --password ${scmPassword} ${CodeLocPath} ."
+        }else{
          error 'This Code Type is not supported in our current Implementation , Please Check after some time'
          echo  'Thanks for Understanding'
         }
