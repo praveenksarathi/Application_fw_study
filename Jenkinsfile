@@ -1,6 +1,6 @@
 // This is a sample file for Multi-Platform integration Pipeline.
-    def DockerRegsitryTemp = ''
-    def DockerRegistryPerm = ''
+    def DockerRegsitryTemp = 'ec2-13-55-19-58.ap-southeast-2.compute.amazonaws.com'
+    def DockerRegistryPerm = 'ec2-13-54-206-33.ap-southeast-2.compute.amazonaws.com:5000'
 
 node {
         stage 'Code Pickup From Repository' {
@@ -76,13 +76,48 @@ if (buildAndPackagingReq) {
                 echo "Build Params : " +buildParams
 
                 appCompileAndPacking = docker.build("buildTagName","buildParams")
+            def dockerCMD = readFile buildDockerLocation
+            echo dockerCMD.substring(dockerCMD.indexof('CMD')+3,dockerCMD.length()))
+            appCompileAndPacking.inside {
+            sh echo dockerCMD.substring(dockerCMD.indexof('CMD'+3,dockerCMD.length()))
+            } 
         }
 }else {
         echo 'Compile and Package are not seperate steps , it is inferred that the package is not compiler dependant'
 }
-// *** LEFT EDITING HERE **//
+//____________________________________________________________________________________________________________________________________________________________________
 
+    if (${stage}.toUpperCase() == 'BUILD'){
+        echo 'It is inferred that the package is a Build only application , hence it is moved to a temporary repository'
+        docker.WithRegistry("http://${DockerRegistryTemp}/",'docker-registry-login') {
+                def buildImg
+            stage ('Dockerization and Stage') {
+            buildImg = docker.build("buildTagName","buildParams")
+            buildImg.push();
+            }
+        }
+    }else if ($(stage).toUpperCase() == 'DEPLOY'){
+    echo 'It is inferred that the package is a deploy only application , hence it has to be moved to a permanent repository'
+        docker.WithRegistry("http://${DockerRegistryPerm}/",'docker-registry-login'){
+            def deployImg
+            stage('Dockerization and Publish') {
+            deployImg = docker.build("buildName","buildParams")
+            deployImg.push('latest');
+            }
+        }
+    }else if ($(stage).toUpperCase() == 'CERTIFY'){
+    echo 'It is inferred that the package is a certify only application , hence it has to be moved to a provisioned with a runtime sandbox environment and push it to temporary repository'
+        docker.WithRegistry("http://${DockerRegistryPerm}/","docker-registry-login"){
+            def certifyImg
+            stage ('Dockerization and Certify'){
+            certifyImg = docker.build("buildName","buildParams")
+            certifyImg.push('SNAPSHOT');
+            }
+        }        
+    }
 
-
-
+    stage('Publish the Jenkins Output to Nexus'){
+        echo 'Publishing the Artifacts...'
+        sh 'rm nexus.txt' 
+    }
 }
