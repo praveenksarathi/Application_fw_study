@@ -14,13 +14,13 @@ node {
             }catch (error) {
                 sh "git clone ${CodeLocPath} ."
             }
-        } else if ("${CodeLocType}".toUpperCase()=='SVN') {
+        }else if ("${CodeLocType}".toUpperCase()=='SVN') {
          sh "svn co --username ${scmUsername} --password ${scmPassword} ${CodeLocPath} ."
         }else{
          error 'This Code Type is not supported in our current Implementation , Please Check after some time'
          echo  'Thanks for Understanding'
-        }
-        }
+             }
+      }
         
 def AppModulePresent = fileExists 'app'
 def TestModulePresent = fileExists 'test'
@@ -34,32 +34,28 @@ if (AppModulePresent){
         echo 'There is no defined Application path , hence it is assumed that application is in current directory'
         appPath = ''
 }
-
 if (TestModulePresent){
         echo 'Test Module is found , assumed that Test Cases are Present for the concerned Modules and has to be performed'
         testPath = 'test/'
-}else {
+}else{
         echo 'No Test Modules found , hence it is assumed that no test environment and / or test cases to be performed'
         testPath = ''
 }
-
-// Build And Packaging
-
-def buildAndPackagingReq = True
+def buildAndPackagingReq = true
 def buildDockerLocation = appPath + 'Dockerfile.build'
 def distDockerLocation = appPath + 'Dockerfile.dist'
 def singleDockerFile = appPath + 'Dockerfile'
 
 if (fileExists(buildDockerLocation) && fileExists(distDockerLocation)) {
         echo 'Looks like this application contains seperate Build and Distribution Docker Files , its assumed to be developed in compiler dependant programming language.'
-        buildAndPackagingReq = True;
+        buildAndPackagingReq = true;
 } else if (fileExists(singleDockerFile)) {
         echo 'This application contains a single docker file , it is assumed to be developed in compiler in-dependant / interpreter based programming language.'
-        buildAndPackagingReq = False;
+        buildAndPackagingReq = false;
         distDockerFile = singleDockerFile
 } else {
         error 'No Docker File found in the specified path :' + appPath
-        buildAndPackagingReq = False;
+        buildAndPackagingReq = false;
 }
 
 // Copying App Directory to current working directory
