@@ -52,14 +52,14 @@ def singleDockerFile = appPath + 'Dockerfile'
 
 if (fileExists(buildDockerLocation) && fileExists(distDockerLocation)) {
         echo 'Looks like this application contains seperate Build and Distribution Docker Files , its assumed to be developed in compiler dependant programming language.'
-        buildAndPackagingReq = True
+        buildAndPackagingReq = True;
 } else if (fileExists(singleDockerFile)) {
         echo 'This application contains a single docker file , it is assumed to be developed in compiler in-dependant / interpreter based programming language.'
-        buildAndPackagingReq = False
+        buildAndPackagingReq = False;
         distDockerFile = singleDockerFile
 } else {
         error 'No Docker File found in the specified path :' + appPath
-        buildAndPackagingReq = False
+        buildAndPackagingReq = False;
 }
 
 // Copying App Directory to current working directory
@@ -76,12 +76,10 @@ if (buildAndPackagingReq) {
         echo 'Compile and Packaging runs as separate entities , it is inferred that the App package is compiler dependant'
         stage ('Build , Test and Package ') {
                 echo 'Working Directory for Docker Build file : ' + appWorkingDir
-                def buildTagName = '${dockerRepo}/${dockerImageName}-build:${env.BUILD_NUMBER}'
-                def buildParams =  '--file ${buildDockerFile} ${appWorkingDir}'
-                echo "Build Tag Name :" +buildTagName
-                echo "Build Params : " +buildParams
+                echo "Build Tag Name : ${dockerRepo}/${dockerImageName}-build:${env.BUILD_NUMBER} "
+                echo "Build Params : --file ${buildDockerFile} ${appWorkingDir} "
 
-                appCompileAndPacking = docker.build("buildTagName","buildParams")
+            appCompileAndPacking = docker.build("${dockerRepo}/${dockerImageName}-build:${env.BUILD_NUMBER}","--file ${buildDockerFile} ${appWorkingDir}")
             def dockerCMD = readFile buildDockerLocation
             echo dockerCMD.substring(dockerCMD.indexof('CMD')+3,dockerCMD.length())
             appCompileAndPacking.inside {
