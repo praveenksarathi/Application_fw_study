@@ -3,7 +3,7 @@
     def DockerRegistryPerm = 'ec2-13-54-206-33.ap-southeast-2.compute.amazonaws.com'
 
 node {
-        stage 'Code Pickup' {
+        stage ('Code Pickup') {
         echo 'The Picked Up Code Type is : ${CodeLocType}'
         echo 'The Picked Up Code Path is : ${CodeLocPath}'
         
