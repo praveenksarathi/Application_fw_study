@@ -83,9 +83,9 @@ if (buildAndPackagingReq) {
 
                 appCompileAndPacking = docker.build("buildTagName","buildParams")
             def dockerCMD = readFile buildDockerLocation
-            echo dockerCMD.substring(dockerCMD.indexof('CMD')+3,dockerCMD.length()))
+            echo dockerCMD.substring(dockerCMD.indexof('CMD')+3,dockerCMD.length())
             appCompileAndPacking.inside {
-            sh echo dockerCMD.substring(dockerCMD.indexof('CMD'+3,dockerCMD.length()))
+            sh echo dockerCMD.substring(dockerCMD.indexof('CMD')+3,dockerCMD.length())
             } 
         }
 }else {
