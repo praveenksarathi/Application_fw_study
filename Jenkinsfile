@@ -7,14 +7,14 @@ node {
         echo 'The Picked Up Code Type is : ${CodeLocType}'
         echo 'The Picked Up Code Path is : ${CodeLocPath}'
         
-        if ("${CodeLocType}".toUpperCase()) == 'GIT' {
+        if ("${CodeLocType}".toUpperCase()=='GIT') {
          CodeLocPath = CodeLocPath.substring(0, CodeLocPath.indexOf("//")+2) + scmUsername + ":" + scmPassword + "@" +CodeLocPath.substring(CodeLocPath.indexOf("//")+2, CodeLocPath.length());
             try {
                 sh 'ls -a | xargs rm -fr'
             }catch (error) {
                 sh "git clone ${CodeLocPath} ."
             }
-        } else if ("${CodeLocType}".toUpperCase()) == 'SVN' {
+        } else if ("${CodeLocType}".toUpperCase()=='SVN') {
          sh "svn co --username ${scmUsername} --password ${scmPassword} ${CodeLocPath} ."
         }else{
          error 'This Code Type is not supported in our current Implementation , Please Check after some time'
