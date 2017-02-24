@@ -1,6 +1,6 @@
 // This is a sample file for Multi-Platform integration Pipeline.
-    def DockerRegsitryTemp = 'ec2-13-55-19-58.ap-southeast-2.compute.amazonaws.com'
-    def DockerRegistryPerm = 'ec2-13-54-206-33.ap-southeast-2.compute.amazonaws.com:5000'
+    def DockerRegistryTemp = 'ec2-13-55-19-58.ap-southeast-2.compute.amazonaws.com'
+    def DockerRegistryPerm = 'ec2-13-54-206-33.ap-southeast-2.compute.amazonaws.com'
 
 node {
         stage 'Code Pickup From Repository' {
@@ -9,6 +9,11 @@ node {
         
         if ("${CodeLocType}").toUpperCase() == 'GIT' {
          CodeLocPath = CodeLocPath.substring(0, CodeLocPath.indexOf("//")+2) + scmUsername + ":" + scmPassword + "@" +CodeLocPath.substring(CodeLocPath.indexOf("//")+2, CodeLocPath.length());
+            try {
+                sh 'ls -a | xargs rm -fr'
+            }catch (error) {
+                sh "git clone ${CodeLocPath} ."
+            }
         } else if ("${CodeLocType}").toUpperCase() == 'SVN' {
          sh "svn co --username ${scmUsername} --password ${scmPassword} ${CodeLocPath} ."
         }else{
